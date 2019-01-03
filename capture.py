@@ -6,7 +6,6 @@ import ipaddress
 from ethernet import Ethernet
 from ipv4 import IPv4
 from tcp import TCP
-from utils import bin2str, bin2int
 
 def display_packet(packet):
     suffix = "+"*50
