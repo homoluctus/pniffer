@@ -3,115 +3,10 @@ import sys
 import socket
 import ipaddress
 
+from ethernet import Ethernet
+from ipv4 import IPv4
+from tcp import TCP
 from utils import bin2str, bin2int
-
-class Ethernet:
-    def __init__(self, packet):
-        self.packet = packet
-        self.__payload = packet[14:]
-
-    @property
-    def payload(self):
-        return self.__payload
-
-    def dst_mac(self):
-        raw_data = bin2str(self.packet[0:6])
-        return self.process_mac(raw_data)
-
-    def src_mac(self):
-        raw_data = bin2str(self.packet[6:12])
-        return self.process_mac(raw_data)
-
-    def ethertype(self):
-        return bin2str(self.packet[12:14])
-
-    def process_mac(self, raw_mac):
-        return (':').join([raw_mac[i:i+2] for i in range(0, 12, 2)])
-
-
-class IPv4:
-    """
-    Support only little endian.
-    """
-
-    def __init__(self, packet):
-        self.packet = packet
-        self.__payload = packet[self.header_length():]
-
-    @property
-    def payload(self):
-        return self.__payload
-
-    def version(self):
-        return self.packet[0] >> 4
-
-    def header_length(self):
-        return (self.packet[0] & 0x0f) * 4
-
-    def tos(self):
-        return bin2str(self.packet[1])
-
-    def total_length(self):
-        return bin2int(self.packet[2:4])
-
-    def identification(self):
-        return bin2int(self.packet[4:6])
-
-    def flags(self):
-        return bin2str(self.packet[6] & 0x03)
-
-    def fragment_offset(self):
-        return bin2str(self.packet[6:8])
-
-    def ttl(self):
-        return bin2int(self.packet[8])
-
-    def protocol(self):
-        return bin2int(self.packet[9])
-
-    def checksum(self):
-        return bin2str(self.packet[10:12])
-
-    def src_ip(self):
-        return self.process_ip(bin2int(self.packet[12:16]))
-
-    def dst_ip(self):
-        return self.process_ip(bin2int(self.packet[16:20]))
-
-    def process_ip(self, ip):
-        return ipaddress.ip_address(ip)
-
-class TCP:
-    def __init__(self, packet):
-        self.packet = packet
-        #self.__payload = packet[self.data_offset():]
-
-    def src_port(self):
-        return bin2int(self.packet[0:2])
-
-    def dst_port(self):
-        return bin2int(self.packet[2:4])
-
-    def sequence_number(self):
-        return bin2str(self.packet[4:8])
-
-    def acknowledgement_number(self):
-        return bin2str(self.packet[8:12])
-
-    def data_offset(self):
-        return bin2int(self.packet[13]) & 0x0f * 4
-
-    def control_flag(self):
-        return self.packet[13]
-
-    def window_size(self):
-        return bin2int(self.packet[14:16])
-
-    def checksum(self):
-        return bin2str(self.packet[16:18])
-
-    def urgent_pointer(self):
-        return bin2str(self.packet[18:20])
 
 def display_packet(packet):
     suffix = "+"*50
@@ -122,7 +17,7 @@ def display_packet(packet):
     print("destination mac address:", ether.dst_mac())
     print("ethertype:", ether.ethertype())
 
-    if ether.ethertype() != '0800':
+    if ether.ethertype() != '0x800':
         return
 
     ip = IPv4(ether.payload)
@@ -133,14 +28,16 @@ def display_packet(packet):
     print("source ip address:", ip.src_ip())
     print("destination ip address:", ip.dst_ip())
 
-    if ip.protocol() != 6:
+    if ip.protocol().value != 6:
         return
 
     tcp = TCP(ip.payload)
     print("\nTCP", suffix)
-    print("source port", tcp.src_port())
-    print("destination port", tcp.dst_port())
-    print("control flag", tcp.control_flag())
+    print("source port:", tcp.src_port())
+    print("destination port:", tcp.dst_port())
+    print("control flag:", tcp.control_flag())
+    print("header length:", tcp.data_offset())
+    print("window size:", tcp.window_size())
 
 
 if __name__ == '__main__':
