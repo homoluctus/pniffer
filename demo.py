@@ -1,7 +1,5 @@
 import struct
-import sys
 import socket
-import ipaddress
 
 from ethernet import Ethernet
 from ipv4 import IPv4
@@ -40,22 +38,34 @@ def display_packet(packet):
 
 
 if __name__ == '__main__':
-    iface = 'lo'
-    ETH_P_ALL = 3
-    PACKET_MR_PROMISC = 1
-    PACKET_ADD_MEMBERSHIP = 1
-    SOL_PACKET = 263
+    interface = 'lo'
 
-    ifindex = socket.if_nametoindex(iface)
-    action = PACKET_MR_PROMISC
-    alen = 0
-    address = b'\0'
+    # For proto argument of socket object
+    ETH_P_ALL = 3   # All protocol pakcet
 
-    packet_mreq = struct.pack('iHH8s', ifindex, action, alen, address)
+    # For socket.setsockopt()
+    SOL_PACKET = 263    # Socket level
+    PACKET_ADD_MEMBERSHIP = 1   # Socket option name
+
+    # For mr_type (action) of packet_mreq structure 
+    PACKET_MR_PROMISC = 1   # Promiscuous mode
+
+    # For packet_mreq structure
+    mr_ifindex = socket.if_nametoindex(interface)   # c_type is int
+    mr_type = PACKET_MR_PROMISC                     # c_type is unsigned short
+    mr_alen = 0                                     # c_type is unsigned short
+    mr_address = b'\0'                              # c_type is unsigned char[8]
+
+    packet_mreq = struct.pack('iHH8s',
+                              mr_ifindex,
+                              mr_type,
+                              mr_alen,
+                              mr_address)
 
     with socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL)) as sock:
-        sock.bind((iface, 0))
+        sock.bind((interface, 0))
         sock.setsockopt(SOL_PACKET, PACKET_ADD_MEMBERSHIP, packet_mreq)
+        
         try:
             while True:
                 packet = sock.recv(1024)
