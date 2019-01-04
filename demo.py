@@ -4,6 +4,7 @@ import socket
 from ethernet import Ethernet
 from ipv4 import IPv4
 from tcp import TCP
+from udp import UDP
 
 def display_packet(packet):
     suffix = "+"*50
@@ -25,17 +26,24 @@ def display_packet(packet):
     print("source ip address:", ip.src_ip())
     print("destination ip address:", ip.dst_ip())
 
-    if ip.protocol().value != 6:
-        return
+    l4_protocol = ip.protocol().name
 
-    tcp = TCP(ip.payload)
-    print("\nTCP", suffix)
-    print("source port:", tcp.src_port())
-    print("destination port:", tcp.dst_port())
-    print("control flag:", tcp.control_flag())
-    print("header length:", tcp.data_offset())
-    print("window size:", tcp.window_size())
+    if l4_protocol == 'TCP':
+        tcp = TCP(ip.payload)
+        print("\nTCP", suffix)
+        print("source port:", tcp.src_port())
+        print("destination port:", tcp.dst_port())
+        print("control flag:", tcp.control_flag())
+        print("header length:", tcp.data_offset())
+        print("window size:", tcp.window_size())
 
+    elif l4_protocol == 'UDP':
+        udp = UDP(ip.payload)
+        print("\nUDP", suffix)
+        print("source port:", udp.src_port())
+        print("destination port:", udp.dst_port())
+        print("packet length: %d bytes" % udp.packet_length())
+        print("checksum: %#x" % udp.checksum())
 
 if __name__ == '__main__':
     interface = 'lo'
@@ -65,7 +73,7 @@ if __name__ == '__main__':
     with socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL)) as sock:
         sock.bind((interface, 0))
         sock.setsockopt(SOL_PACKET, PACKET_ADD_MEMBERSHIP, packet_mreq)
-        
+
         try:
             while True:
                 packet = sock.recv(1024)
