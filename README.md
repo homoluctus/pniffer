@@ -8,6 +8,7 @@ Network sniffer tool written by Python
 - Ethernet
 - IPv4
 - TCP
+- UDP
 
 ## Demo
 
