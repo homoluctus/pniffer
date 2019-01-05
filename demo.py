@@ -1,10 +1,13 @@
 import struct
 import socket
 
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/pniffer')
+
 from pniffer.ethernet import Ethernet
 from pniffer.ipv4 import IPv4
 from pniffer.tcp import TCP
-from upniffer.dp import UDP
+from pniffer.udp import UDP
 
 def display_packet(packet):
     suffix = "+"*50
