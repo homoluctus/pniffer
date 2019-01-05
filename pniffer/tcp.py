@@ -1,6 +1,7 @@
 from enum import Enum
 from .utils import bin2str, bin2int
 
+
 class TCP:
     def __init__(self, packet):
         self.packet = packet
@@ -33,6 +34,7 @@ class TCP:
     def urgent_pointer(self):
         return bin2str(self.packet[18:20])
 
+
 class FlagHandler:
     """
     Return a list includes 2-tuple (Flag.name, hex(Flag.value))
@@ -46,7 +48,10 @@ class FlagHandler:
 
     @classmethod
     def _get(cls, value):
-        return [(member.name, hex(member.value)) for key, member in Flag._value2member_map_.items() if (key & value) != 0x0]
+        return [(member.name, hex(member.value))
+                for key, member in Flag._value2member_map_.items()
+                if (key & value) != 0x0]
+
 
 class Flag(Enum):
     CWR = 0x80

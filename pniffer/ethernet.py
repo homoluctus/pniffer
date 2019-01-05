@@ -1,5 +1,6 @@
 from .utils import bin2str, bin2int
 
+
 class Ethernet:
     def __init__(self, packet):
         self.packet = packet

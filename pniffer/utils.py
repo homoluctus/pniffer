@@ -1,12 +1,14 @@
 import socket
 import binascii
 
+
 def bin2str(data, encoding='utf-8'):
     """
     Convert binary data to utf-8 string.
     """
 
     return binascii.hexlify(data).decode(encoding)
+
 
 def bin2int(raw_data, base=16):
     """
@@ -22,6 +24,7 @@ def bin2int(raw_data, base=16):
 
     return int(data, base)
 
+
 def ip2domain(ip):
     """
     Resolve given address to domain name.
@@ -30,12 +33,12 @@ def ip2domain(ip):
     if not isinstance(ip, str):
         try:
             ip = str(ip)
-        except:
+        except Exception:
             raise
 
     try:
         host = socket.gethostbyaddr(ip)[0]
-    except:
+    except socket.herror:
         host = ip
 
     return host

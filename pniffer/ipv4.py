@@ -3,6 +3,7 @@ from enum import Enum
 
 from .utils import bin2str, bin2int
 
+
 class IPv4:
     """
     Support only little endian.
@@ -59,18 +60,19 @@ class IPv4:
     def _format_ip(self, ip):
         return ipaddress.ip_address(ip)
 
+
 class Protocol(Enum):
-    IP   = 0
+    IP = 0
     ICMP = 1
     IGMP = 2
-    TCP  = 6
-    UDP  = 17
-    IP6  = 41
+    TCP = 6
+    UDP = 17
+    IP6 = 41
     IP6_ROUTE = 43
-    IP6_FLAG  = 44
-    GRE  = 47
-    ESP  = 50
-    AH   = 51
+    IP6_FLAG = 44
+    GRE = 47
+    ESP = 50
+    AH = 51
     ICMP6 = 58
 
     def __str__(self):
