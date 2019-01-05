@@ -11,8 +11,7 @@ except (ModuleNotFoundError, ImportError):
     from traceback import print_exc
     print_exc()
     sys.exit("\n[!] Please add pniffer path to PYTHONPATH")
-except:
-    raise
+
 
 def display_packet(packet):
     suffix = "+"*50
@@ -53,6 +52,7 @@ def display_packet(packet):
         print("packet length: %d bytes" % udp.packet_length())
         print("checksum: %#x" % udp.checksum())
 
+
 if __name__ == '__main__':
     interface = 'lo'
 
@@ -63,14 +63,14 @@ if __name__ == '__main__':
     SOL_PACKET = 263    # Socket level
     PACKET_ADD_MEMBERSHIP = 1   # Socket option name
 
-    # For mr_type (action) of packet_mreq structure 
+    # For mr_type (action) of packet_mreq structure
     PACKET_MR_PROMISC = 1   # Promiscuous mode
 
     # For packet_mreq structure
     mr_ifindex = socket.if_nametoindex(interface)   # c_type is int
     mr_type = PACKET_MR_PROMISC                     # c_type is unsigned short
-    mr_alen = 0                                     # c_type is unsigned short
-    mr_address = b'\0'                              # c_type is unsigned char[8]
+    mr_alen = 0           # c_type is unsigned short
+    mr_address = b'\0'    # c_type is unsigned char[8]
 
     packet_mreq = struct.pack('iHH8s',
                               mr_ifindex,
@@ -78,7 +78,9 @@ if __name__ == '__main__':
                               mr_alen,
                               mr_address)
 
-    with socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL)) as sock:
+    with socket.socket(socket.AF_PACKET,
+                       socket.SOCK_RAW,
+                       socket.htons(ETH_P_ALL)) as sock:
         sock.bind((interface, 0))
         sock.setsockopt(SOL_PACKET, PACKET_ADD_MEMBERSHIP, packet_mreq)
 
@@ -88,6 +90,3 @@ if __name__ == '__main__':
                 display_packet(packet)
         except KeyboardInterrupt:
             print("EXIT")
-        except:
-            from traceback import print_exc
-            print_exc()
