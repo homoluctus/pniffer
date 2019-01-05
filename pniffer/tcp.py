@@ -1,5 +1,5 @@
 from enum import Enum
-from utils import bin2str, bin2int
+from .utils import bin2str, bin2int
 
 class TCP:
     def __init__(self, packet):

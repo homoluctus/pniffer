@@ -1,4 +1,4 @@
-from utils import bin2str, bin2int
+from .utils import bin2str, bin2int
 
 class UDP:
     def __init__(self, packet):
