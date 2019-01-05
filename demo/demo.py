@@ -1,13 +1,18 @@
 import struct
 import socket
 
-import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/pniffer')
-
-from pniffer.ethernet import Ethernet
-from pniffer.ipv4 import IPv4
-from pniffer.tcp import TCP
-from pniffer.udp import UDP
+try:
+    from pniffer.ethernet import Ethernet
+    from pniffer.ipv4 import IPv4
+    from pniffer.tcp import TCP
+    from pniffer.udp import UDP
+except (ModuleNotFoundError, ImportError):
+    import sys
+    from traceback import print_exc
+    print_exc()
+    sys.exit("\n[!] Please add pniffer path to PYTHONPATH")
+except:
+    raise
 
 def display_packet(packet):
     suffix = "+"*50
