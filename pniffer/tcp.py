@@ -1,11 +1,25 @@
 from enum import Enum
-from .utils import bin2str, bin2int
+
+from .utils import (
+    bin2str, bin2int, generate_header_dict)
 
 
 class TCP:
     def __init__(self, packet):
         self.packet = packet
         self.__payload = packet[self.data_offset():]
+
+    def __call__(self):
+        field_name = ['source_port', 'destination_port', 'sequence_number',
+                      'acknowledgement_number', 'data_offset', 'control_flag',
+                      'window_size', 'checksum', 'urgent_pointer']
+
+        values = (self.src_port(), self.dst_port(), self.sequence_number(),
+                  self.acknowledgement_number(), self.data_offset(),
+                  self.control_flag(), self.window_size(), self.checksum(),
+                  self.urgent_pointer())
+
+        return generate_header_dict(field_name, values)
 
     def src_port(self):
         return bin2int(self.packet[0:2])
@@ -29,7 +43,7 @@ class TCP:
         return bin2int(self.packet[14:16])
 
     def checksum(self):
-        return bin2str(self.packet[16:18])
+        return bin2int(self.packet[16:18])
 
     def urgent_pointer(self):
         return bin2str(self.packet[18:20])

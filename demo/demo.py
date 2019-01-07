@@ -1,3 +1,4 @@
+import json
 import struct
 import socket
 
@@ -15,44 +16,31 @@ except (ModuleNotFoundError, ImportError):
     sys.exit("\n[!] Please add pniffer path to PYTHONPATH")
 
 
-def display_packet(packet):
-    suffix = "+"*50
+def display_packet(packet, fmt=None):
+    packets = {}
 
     ether = Ethernet(packet)
-    print("\nEthernet", suffix)
-    print("source mac address:", ether.src_mac())
-    print("destination mac address:", ether.dst_mac())
-    print("ethertype:", ether.ethertype())
+    packets['Ethernet'] = ether()
 
     if ether.ethertype() != '0x800':
         return
-
+    
     ip = IPv4(ether.payload)
-    print("\nIPv4", suffix)
-    print("version", ip.version())
-    print("header length:", ip.header_length())
-    print("protocol:", ip.protocol())
-    print("source ip address:", ip.src_ip())
-    print("destination ip address:", ip.dst_ip())
+    packets['IPv4'] = ip()
 
     l4_protocol = ip.protocol().name
 
     if l4_protocol == 'TCP':
         tcp = TCP(ip.payload)
-        print("\nTCP", suffix)
-        print("source port:", tcp.src_port())
-        print("destination port:", tcp.dst_port())
-        print("control flag:", tcp.control_flag())
-        print("header length:", tcp.data_offset())
-        print("window size:", tcp.window_size())
-
+        packets['TCP'] = tcp()
     elif l4_protocol == 'UDP':
         udp = UDP(ip.payload)
-        print("\nUDP", suffix)
-        print("source port:", udp.src_port())
-        print("destination port:", udp.dst_port())
-        print("packet length: %d bytes" % udp.packet_length())
-        print("checksum: %#x" % udp.checksum())
+        packets['UDP'] = udp()
+
+    if fmt == 'json':
+        print(json.dumps(packets, indent=2))
+    else:
+        print(packets)
 
 
 if __name__ == '__main__':
@@ -70,6 +58,6 @@ if __name__ == '__main__':
         try:
             while True:
                 packet = sock.recv(1024)
-                display_packet(packet)
+                display_packet(packet, fmt='json')
         except KeyboardInterrupt:
             print("EXIT")
