@@ -3,6 +3,7 @@ Network sniffer tool written by Python
 
 ## Feature
 - Promiscuous mode
+- json dump
 
 ## Supported Protocol
 - Ethernet
