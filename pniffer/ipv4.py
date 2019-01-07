@@ -63,7 +63,7 @@ class IPv4:
         return Protocol(self.packet[9])
 
     def checksum(self):
-        return bin2str(self.packet[10:12])
+        return bin2int(self.packet[10:12])
 
     def src_ip(self):
         return self._format_ip(bin2int(self.packet[12:16]))
