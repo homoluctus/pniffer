@@ -1,5 +1,6 @@
 import socket
 import binascii
+from collections import namedtuple
 
 
 def bin2str(data, encoding='utf-8'):
@@ -42,3 +43,16 @@ def ip2domain(ip):
         host = ip
 
     return host
+
+
+def generate_header_dict(field_name, values):
+    if not isinstance(values, (list, tuple, dict)):
+        raise TypeError
+
+    try:
+        Header = namedtuple('Header', field_name)
+        header = Header._make(values)
+    except:
+        raise
+
+    return dict(header._asdict())
