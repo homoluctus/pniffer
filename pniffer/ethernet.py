@@ -1,10 +1,18 @@
-from .utils import bin2str, bin2int
+from collections import namedtuple
+
+from .utils import bin2str, bin2int, generate_header_dict
 
 
 class Ethernet:
     def __init__(self, packet):
         self.packet = packet
         self.__payload = packet[14:]
+
+    def __call__(self):
+        field_name = ['destination', 'source', 'ethertype']
+        values = (self.dst_mac(), self.src_mac(), self.ethertype())
+
+        return generate_header_dict(field_name, values)
 
     @property
     def payload(self):
