@@ -2,6 +2,7 @@ import sys
 import json
 import struct
 import socket
+import pprint
 
 try:
     from pniffer.ethernet import Ethernet
@@ -25,7 +26,7 @@ def display_packet(packet, fmt=None):
 
     if ether.ethertype() != '0x800':
         return
-    
+
     ip = IPv4(ether.payload)
     packets['IPv4'] = ip()
 
@@ -39,9 +40,11 @@ def display_packet(packet, fmt=None):
         packets['UDP'] = udp()
 
     if fmt == 'json':
-        print(json.dumps(packets, indent=2), flush=True)
+        print(json.dumps(packets, indent=2))
     else:
-        print(packets, flush=True)
+        pprint.pprint(packets)
+
+    sys.stdout.flush()
 
 
 def main():
