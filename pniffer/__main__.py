@@ -18,7 +18,7 @@ except (ModuleNotFoundError, ImportError):
     sys.exit("\n[!] Please add pniffer path to PYTHONPATH")
 
 
-def display_packet(packet, fmt=None):
+def dump_packet(packet, file, fmt=None):
     packets = {}
 
     ether = Ethernet(packet)
@@ -40,11 +40,12 @@ def display_packet(packet, fmt=None):
         packets['UDP'] = udp()
 
     if fmt == 'json':
-        print(json.dumps(packets, indent=2))
+        file.write(json.dumps(packets, indent=2))
     else:
-        pprint.pprint(packets)
+        file.write(str(packets))
 
-    sys.stdout.flush()
+    if file.name == '<stdout>':
+        file.flush()
 
 
 def main():
@@ -64,9 +65,11 @@ def main():
         try:
             while True:
                 packet = sock.recv(1024)
-                display_packet(packet, fmt=args.fmt)
+                dump_packet(packet, args.file, fmt=args.fmt)
         except KeyboardInterrupt:
             print("EXIT")
+        finally:
+            args.file.close()
 
 
 if __name__ == '__main__':
