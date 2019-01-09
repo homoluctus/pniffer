@@ -5,6 +5,7 @@ Network sniffer tool written by Python
 - Promiscuous mode
 - Command line operation
 - json dump
+- Write captured packet to file
 
 ## Supported Protocol
 - Ethernet
