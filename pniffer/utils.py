@@ -23,7 +23,10 @@ def bin2int(raw_data, base=16):
     else:
         data = raw_data
 
-    return int(data, base)
+    try:
+        return int(data, base)
+    except Exception:
+        raise
 
 
 def ip2domain(ip):
@@ -38,11 +41,9 @@ def ip2domain(ip):
             raise
 
     try:
-        host = socket.gethostbyaddr(ip)[0]
+        return socket.gethostbyaddr(ip)[0]
     except socket.herror:
-        host = ip
-
-    return host
+        return ip
 
 
 def generate_header_dict(field_name, values):
@@ -52,7 +53,7 @@ def generate_header_dict(field_name, values):
     try:
         Header = namedtuple('Header', field_name)
         header = Header._make(values)
-    except:
+    except Exception:
         raise
 
     return dict(header._asdict())
