@@ -42,7 +42,7 @@ class UtilsTestCase(unittest.TestCase):
         """
         Mismatch the number of argument
         """
-        
+
         keys = ['a', 'b', 'c']
         values = ['A', 'B']
 
