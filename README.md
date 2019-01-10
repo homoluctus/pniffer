@@ -6,6 +6,7 @@ Network sniffer tool written by Python
 - Command line operation
 - json dump
 - Write captured packet to file
+- Binary output
 
 ## Supported Protocol
 - Ethernet
