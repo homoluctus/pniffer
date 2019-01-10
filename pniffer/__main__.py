@@ -18,10 +18,10 @@ except (ModuleNotFoundError, ImportError):
     sys.exit("\n[!] Please add pniffer path to PYTHONPATH")
 
 
-def dump_packet(packet, file, fmt=None):
+def get_formatted_packets(raw_packets, fmt=None):
     packets = {}
 
-    ether = Ethernet(packet)
+    ether = Ethernet(raw_packets)
     packets['Ethernet'] = ether()
 
     if ether.ethertype() != '0x800':
@@ -40,16 +40,26 @@ def dump_packet(packet, file, fmt=None):
         packets['UDP'] = udp()
 
     if fmt == 'json':
-        file.write(json.dumps(packets, indent=2))
+        return json.dumps(packets, indent=2)
     else:
-        file.write(str(packets))
-
-    if file.name == '<stdout>':
-        file.flush()
+        return pprint.pformat(packets) + '\n'
 
 
 def main():
     args = operate_args()
+
+    if args.binary:
+        filemode = 'ab'
+    else:
+        filemode = 'a'
+
+    if getattr(args, 'filename') is not None:
+        output_file = open(args.filename, filemode)
+    else:
+        if args.binary:
+            output_file = sys.stdout.buffer
+        else:
+            output_file = sys.stdout
 
     # For proto argument of socket object
     ETH_P_ALL = 3   # All protocol pakcet
@@ -64,12 +74,18 @@ def main():
 
         try:
             while True:
-                packet = sock.recv(1024)
-                dump_packet(packet, args.file, fmt=args.fmt)
+                packets = sock.recv(512)
+
+                if args.binary:
+                    output_file.write(packets)
+                else:
+                    output_file.write(
+                        get_formatted_packets(packets, fmt=args.fmt))
+
         except KeyboardInterrupt:
             print("EXIT")
         finally:
-            args.file.close()
+            output_file.close()
 
 
 if __name__ == '__main__':

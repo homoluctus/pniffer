@@ -20,10 +20,13 @@ def operate_args():
                         dest='fmt',
                         help='Dump json or yaml (default: python dict)')
 
-    parser.add_argument('-w', dest='file',
-                        nargs='?',
-                        default=sys.stdout,
-                        type=argparse.FileType('w'),
-                        help='Write captured packet to file')
+    parser.add_argument('-w', dest='filename',
+                        metavar='FILE',
+                        help='Write captured packet to file. \
+                              Append if FILE exists')
+
+    parser.add_argument('-b', '--binary',
+                        action='store_true',
+                        help='Output binary packets')
 
     return parser.parse_args()
